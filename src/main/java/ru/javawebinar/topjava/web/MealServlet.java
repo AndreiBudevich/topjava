@@ -2,10 +2,9 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.dao.MealDao;
-import ru.javawebinar.topjava.dao.MealDaoImpl;
-import ru.javawebinar.topjava.dao.MealToDao;
-import ru.javawebinar.topjava.dao.MealToDaoImpl;
+import ru.javawebinar.topjava.dao.MealDaoInMemory;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,8 +17,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    private final MealDao mealDAO = new MealDaoImpl();
-    private final MealToDao mealToDao = new MealToDaoImpl();
+    private final MealDao mealDAO;
+
+    public MealServlet() {
+        this.mealDAO = new MealDaoInMemory();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -27,7 +29,7 @@ public class MealServlet extends HttpServlet {
 
         if (action == null) {
             log.debug("action = null, get List<MealTo>");
-            request.setAttribute("mealTo", mealToDao.getList(mealDAO.getConcurrentMap()));
+            request.setAttribute("mealTos", MealsUtil.getSortList(mealDAO.getList()));
             request.getRequestDispatcher("/meals.jsp").forward(request, response);
             return;
         }
@@ -37,19 +39,20 @@ public class MealServlet extends HttpServlet {
                 log.debug("to create");
                 request.getRequestDispatcher("/addMeal.jsp").forward(request, response);
                 break;
-            case ("update"):
+            case ("update"): {
                 log.debug("get MealTo to update");
                 Integer id = Integer.parseInt(request.getParameter("id"));
                 request.setAttribute("meal", mealDAO.find(id));
                 request.getRequestDispatcher("/updateMeal.jsp").forward(request, response);
                 break;
-            case ("delete"):
-                Integer id2 = Integer.parseInt(request.getParameter("id"));
-                log.debug("send meal id=" + id2 + " in method MealDAO.deleteMealTo");
-                mealDAO.delete(id2);
-                request.setAttribute("mealTo", mealToDao.getList(mealDAO.getConcurrentMap()));
+            }
+            case ("delete"): {
+                Integer id = Integer.parseInt(request.getParameter("id"));
+                log.debug("MealDaoInMemory#delete id=" + id);
+                mealDAO.delete(id);
                 response.sendRedirect(request.getContextPath() + "/meals");
                 break;
+            }
         }
     }
 
@@ -62,20 +65,17 @@ public class MealServlet extends HttpServlet {
         int calories = Integer.parseInt(request.getParameter("calories"));
 
         if (idString == null || idString.isEmpty()) {
-            mealDAO.create(dateTime, description, calories);
-            log.debug("create new Meal");
-            request.setAttribute("mealTo", mealToDao.getList(mealDAO.getConcurrentMap()));
-            response.sendRedirect(request.getContextPath() + "/meals");
+            Meal meal = new Meal(dateTime, description, calories);
+            log.debug("MealDaoInMemory#create");
+            mealDAO.create(meal);
+
         } else {
             Integer id = Integer.parseInt(idString);
             Meal meal = new Meal(id, dateTime, description, calories);
+            log.debug("MealDaoInMemory#update id=" + id);
             mealDAO.update(meal);
-            log.debug("update " + id + " Meal");
-            request.setAttribute("mealTo", mealToDao.getList(mealDAO.getConcurrentMap()));
-            response.sendRedirect(request.getContextPath() + "/meals");
         }
-
-
+        response.sendRedirect(request.getContextPath() + "/meals");
     }
 }
 

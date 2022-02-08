@@ -6,28 +6,28 @@
 </head>
 <p><b>update Meal</b></p>
 <body>
-<form method="POST" action="meals?id=${meal.getId()}" name="createMeal">
+<form method="POST" action="meals?id=${meal.id}" name="createMeal">
     <table>
         <tbody>
         <tr>
             <td>DateTime:</td>
             <td>
                 <input type="datetime-local" name="date"
-                       value="<c:out value="${meal.getDateTime()}" />"/>
+                       value="<c:out value="${meal.dateTime}" />"/>
             </td>
         </tr>
         <tr>
             <td>Description:</td>
             <td>
                 <input type="text" name="description"
-                       value="<c:out value="${meal.getDescription()}" />"/>
+                       value="<c:out value="${meal.description}" />"/>
             </td>
         </tr>
         <tr>
             <td>calories:</td>
             <td>
                 <input type="text" name="calories"
-                       value="<c:out value="${meal.getCalories()}" />"/>
+                       value="<c:out value="${meal.calories}" />"/>
             </td>
         </tr>
         </tbody>

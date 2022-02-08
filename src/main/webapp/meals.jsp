@@ -18,7 +18,7 @@
         <td></td>
         <td></td>
     </tr>
-    <c:forEach items="${mealTo}" var="mealTo">
+    <c:forEach items="${mealTos}" var="mealTo">
         <tr style="color:${mealTo.excess ? "red" : "green"}">
             <td>${f:formatLocalDateTime(mealTo.dateTime)}</td>
             <td>${mealTo.description}</td>
