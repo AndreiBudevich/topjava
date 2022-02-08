@@ -6,7 +6,7 @@
 </head>
 <p><b>update Meal</b></p>
 <body>
-<form method="POST" action="meals?action=updateMeal&id=${meal.getId()}" name="createMeal">
+<form method="POST" action="meals?id=${meal.getId()}" name="createMeal">
     <table>
         <tbody>
         <tr>
@@ -35,5 +35,6 @@
     <input type="Submit" value="Save"/></form>
 <form method="GET" action="meals" name="postListMeals"><input type="Submit" value="Cancel"/></form>
 </body>
+</head>
 </html>
 

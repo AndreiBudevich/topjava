@@ -1,9 +1,12 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
+import ru.javawebinar.topjava.dao.MealDao;
+import ru.javawebinar.topjava.dao.MealDaoImpl;
+import ru.javawebinar.topjava.dao.MealToDao;
+import ru.javawebinar.topjava.dao.MealToDaoImpl;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.dao.MealDAO;
-import ru.javawebinar.topjava.dao.MealDAOImpl;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,65 +18,64 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    MealDAO mealDAO = MealDAOImpl.getInstance();
+    private final MealDao mealDAO = new MealDaoImpl();
+    private final MealToDao mealToDao = new MealToDaoImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String forward = "";
+        String action = request.getParameter("action");
 
-        if (request.getParameter("action") == null) {
+        if (action == null) {
             log.debug("action = null, get List<MealTo>");
-            request.setAttribute("mealTos", mealDAO.getMealTo());
+            request.setAttribute("mealTo", mealToDao.getList(mealDAO.getConcurrentMap()));
             request.getRequestDispatcher("/meals.jsp").forward(request, response);
             return;
         }
-        String action = request.getParameter("action");
 
-        if (action.equalsIgnoreCase("listMeals")) {
-            log.debug("get List<MealTo>");
-            request.setAttribute("mealTos", mealDAO.getMealTo());
-            forward = "/meals.jsp";
+        switch (action) {
+            case ("create"):
+                log.debug("to create");
+                request.getRequestDispatcher("/addMeal.jsp").forward(request, response);
+                break;
+            case ("update"):
+                log.debug("get MealTo to update");
+                Integer id = Integer.parseInt(request.getParameter("id"));
+                request.setAttribute("meal", mealDAO.find(id));
+                request.getRequestDispatcher("/updateMeal.jsp").forward(request, response);
+                break;
+            case ("delete"):
+                Integer id2 = Integer.parseInt(request.getParameter("id"));
+                log.debug("send meal id=" + id2 + " in method MealDAO.deleteMealTo");
+                mealDAO.delete(id2);
+                request.setAttribute("mealTo", mealToDao.getList(mealDAO.getConcurrentMap()));
+                response.sendRedirect(request.getContextPath() + "/meals");
+                break;
         }
-
-        if (action.equalsIgnoreCase("update")) {
-            log.debug("get MealTo to update");
-            Integer id = Integer.parseInt(request.getParameter("id"));
-            request.setAttribute("meal", mealDAO.findMeal(id));
-            forward = "/updateMeal.jsp";
-        }
-
-        if (action.equalsIgnoreCase("delete")) {
-            Integer id = Integer.parseInt(request.getParameter("id"));
-            log.debug("send meal id=" + id + " in method MealDAO.deleteMealTo");
-            mealDAO.deleteMeal(id);
-            request.setAttribute("mealTos", mealDAO.getMealTo());
-            forward = "/meals.jsp";
-        }
-        request.getRequestDispatcher(forward).forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        String action = request.getParameter("action");
+        String idString = request.getParameter("id");
         LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("date"));
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
 
-        if (action.equalsIgnoreCase("createMeal")) {
-            mealDAO.addMeal(new Meal(MealDAOImpl.generationID(), dateTime, description, calories));
+        if (idString == null || idString.isEmpty()) {
+            mealDAO.create(dateTime, description, calories);
             log.debug("create new Meal");
+            request.setAttribute("mealTo", mealToDao.getList(mealDAO.getConcurrentMap()));
+            response.sendRedirect(request.getContextPath() + "/meals");
+        } else {
+            Integer id = Integer.parseInt(idString);
+            Meal meal = new Meal(id, dateTime, description, calories);
+            mealDAO.update(meal);
+            log.debug("update " + id + " Meal");
+            request.setAttribute("mealTo", mealToDao.getList(mealDAO.getConcurrentMap()));
+            response.sendRedirect(request.getContextPath() + "/meals");
         }
 
 
-        if (action.equalsIgnoreCase("updateMeal")) {
-            Integer id = Integer.parseInt(request.getParameter("id"));
-            mealDAO.updateMeal(id, dateTime, description, calories);
-            log.debug("update " + id +" Meal");
-        }
-
-        request.setAttribute("mealTos", mealDAO.getMealTo());
-        request.getRequestDispatcher("/meals.jsp").forward(request, response);
     }
 }
 

@@ -14,17 +14,6 @@
         <servlet-name>mealServlet</servlet-name>
         <url-pattern>/meals</url-pattern>
     </servlet-mapping>
-
-
-    <servlet>
-        <servlet-name>updateMeal</servlet-name>
-        <jsp-file>/updateMeal.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>updateMeal</servlet-name>
-        <url-pattern>/updateMeal</url-pattern>
-    </servlet-mapping>
-
     <servlet>
         <servlet-name>addMeal</servlet-name>
         <jsp-file>/addMeal.jsp</jsp-file>
@@ -33,5 +22,14 @@
         <servlet-name>addMeal</servlet-name>
         <url-pattern>/addMeal</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>users</servlet-name>
+        <jsp-file>/users.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>users</servlet-name>
+        <url-pattern>/users</url-pattern>
+    </servlet-mapping>
+
 
 </web-app>

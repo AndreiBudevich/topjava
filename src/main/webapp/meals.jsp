@@ -8,32 +8,29 @@
     <title>Meals</title>
 </head>
 <body>
-<b><a href="addMeal?action=create">Add Meal</a></b>
+<b><a href="meals?action=create">Add Meal</a></b>
 <br>
 <table border="2">
     <tr>
-         <td>Date</td>
+        <td>Date</td>
         <td>Description</td>
         <td>Calories</td>
         <td></td>
         <td></td>
     </tr>
-    <c:forEach items="${mealTos}" var="mealTos">
-        <tr style="color:${mealTos.isExcess() == true ? "red" : "green"}">
-            <td>${f:formatLocalDateTime(mealTos.getDateTime(), 'yyyy-MM-dd hh:mm')}</td>
-            <td>${mealTos.getDescription()}</td>
-            <td>${mealTos.getCalories()}</td>
+    <c:forEach items="${mealTo}" var="mealTo">
+        <tr style="color:${mealTo.excess ? "red" : "green"}">
+            <td>${f:formatLocalDateTime(mealTo.dateTime)}</td>
+            <td>${mealTo.description}</td>
+            <td>${mealTo.calories}</td>
             <td>
-                <a href="meals?action=update&id=${mealTos.getId()}">Update</a>
+                <a href="meals?action=update&id=${mealTo.id}">Update</a>
             </td>
             <td>
-                <a href="meals?action=delete&id=${mealTos.getId()}">Delete</a>
+                <a href="meals?action=delete&id=${mealTo.id}">Delete</a>
             </td>
-        </tr>
         </tr>
     </c:forEach>
 </table>
-
-
 </body>
 </html>

@@ -7,11 +7,11 @@ import java.time.LocalTime;
 public class Meal {
     private final Integer id;
 
-    private volatile LocalDateTime dateTime;
+    private LocalDateTime dateTime;
 
-    private volatile String description;
+    private String description;
 
-    private volatile int calories;
+    private int calories;
 
     public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {
         this.id = id;
