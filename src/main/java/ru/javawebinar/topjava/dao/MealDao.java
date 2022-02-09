@@ -13,5 +13,5 @@ public interface MealDao {
 
     Meal update(Meal meal);
 
-    List<Meal> getList();
+    List<Meal> getAll();
 }

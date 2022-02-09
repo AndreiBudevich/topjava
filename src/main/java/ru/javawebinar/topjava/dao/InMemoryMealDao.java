@@ -13,12 +13,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class MealDaoInMemory implements MealDao {
-    private static final Logger log = getLogger(MealDaoInMemory.class);
+public class InMemoryMealDao implements MealDao {
+    private static final Logger log = getLogger(InMemoryMealDao.class);
     private final AtomicInteger lastId = new AtomicInteger(0);
     private final Map<Integer, Meal> meals = new ConcurrentHashMap<>();
 
-    public MealDaoInMemory() {
+    public InMemoryMealDao() {
         create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
         create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000));
         create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500));
@@ -35,7 +35,11 @@ public class MealDaoInMemory implements MealDao {
         return meal;
     }
 
-    public List<Meal> getList() {
+    private Integer generateId() {
+        return lastId.incrementAndGet();
+    }
+
+    public List<Meal> getAll() {
         log.debug("return List<Meal>");
         return new ArrayList<>(meals.values());
     }
@@ -60,8 +64,6 @@ public class MealDaoInMemory implements MealDao {
         return meals.get(id);
     }
 
-    private Integer generateId() {
-        return lastId.incrementAndGet();
-    }
+
 }
 

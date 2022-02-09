@@ -2,7 +2,7 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.dao.MealDao;
-import ru.javawebinar.topjava.dao.MealDaoInMemory;
+import ru.javawebinar.topjava.dao.InMemoryMealDao;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -20,7 +20,7 @@ public class MealServlet extends HttpServlet {
     private final MealDao mealDAO;
 
     public MealServlet() {
-        this.mealDAO = new MealDaoInMemory();
+        this.mealDAO = new InMemoryMealDao();
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MealServlet extends HttpServlet {
 
         if (action == null) {
             log.debug("action = null, get List<MealTo>");
-            request.setAttribute("mealTos", MealsUtil.getSortList(mealDAO.getList()));
+            request.setAttribute("mealTos", MealsUtil.getList(mealDAO.getAll()));
             request.getRequestDispatcher("/meals.jsp").forward(request, response);
             return;
         }
@@ -41,14 +41,14 @@ public class MealServlet extends HttpServlet {
                 break;
             case ("update"): {
                 log.debug("get MealTo to update");
-                Integer id = Integer.parseInt(request.getParameter("id"));
+                int id = Integer.parseInt(request.getParameter("id"));
                 request.setAttribute("meal", mealDAO.find(id));
                 request.getRequestDispatcher("/updateMeal.jsp").forward(request, response);
                 break;
             }
             case ("delete"): {
-                Integer id = Integer.parseInt(request.getParameter("id"));
-                log.debug("MealDaoInMemory#delete id=" + id);
+                int id = Integer.parseInt(request.getParameter("id"));
+                log.debug("InMemoryMealDao#delete id={}", id);
                 mealDAO.delete(id);
                 response.sendRedirect(request.getContextPath() + "/meals");
                 break;
@@ -58,7 +58,6 @@ public class MealServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
         String idString = request.getParameter("id");
         LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("date"));
         String description = request.getParameter("description");
@@ -66,13 +65,13 @@ public class MealServlet extends HttpServlet {
 
         if (idString == null || idString.isEmpty()) {
             Meal meal = new Meal(dateTime, description, calories);
-            log.debug("MealDaoInMemory#create");
+            log.debug("InMemoryMealDao#create");
             mealDAO.create(meal);
 
         } else {
             Integer id = Integer.parseInt(idString);
             Meal meal = new Meal(id, dateTime, description, calories);
-            log.debug("MealDaoInMemory#update id=" + id);
+            log.debug("InMemoryMealDao#update id={}", id);
             mealDAO.update(meal);
         }
         response.sendRedirect(request.getContextPath() + "/meals");

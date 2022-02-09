@@ -13,21 +13,21 @@
             <td>DateTime:</td>
             <td>
                 <input type="datetime-local" name="date"
-                       value="<c:out value="${meal.dateTime}" />"/>
+                       value="${meal.dateTime}"/>
             </td>
         </tr>
         <tr>
             <td>Description:</td>
             <td>
                 <input type="text" name="description"
-                       value="<c:out value="${meal.description}" />"/>
+                       value="${meal.description}"/>
             </td>
         </tr>
         <tr>
             <td>calories:</td>
             <td>
                 <input type="text" name="calories"
-                       value="<c:out value="${meal.calories}" />"/>
+                       value="${meal.calories}"/>
             </td>
         </tr>
         </tbody>
