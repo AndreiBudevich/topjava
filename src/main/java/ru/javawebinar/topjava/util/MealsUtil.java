@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealsUtil {
-    public static Predicate<Meal> predicate;
+
     private static final Logger log = getLogger(MealsUtil.class);
     private static final int caloriesPerDay = 2000;
 
@@ -23,6 +23,7 @@ public class MealsUtil {
         return MealsUtil.filteredByStreams(meals, caloriesPerDay);
     }
 
+    public static Predicate<Meal> predicate;
     public static List<MealTo> filteredByStreams(List<Meal> meals, int caloriesPerDay, LocalTime... localTimes) {
         if (localTimes.length == 0) {
             predicate = meal -> true;
