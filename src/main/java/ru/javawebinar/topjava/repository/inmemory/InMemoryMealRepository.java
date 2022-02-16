@@ -48,15 +48,13 @@ public class InMemoryMealRepository implements MealRepository {
             return null;
         }
         meal.setUserId(userId);
-        return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+        return repository.compute(meal.getId(), (id, oldMeal) -> meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        if (repository.get(id) == null) {
-            return false;
-        }
-        if (repository.get(id).getUserId() != userId) {
+        Meal meal;
+        if ((meal = repository.get(id)) == null || meal.getUserId() != userId) {
             return false;
         }
         return repository.remove(id) != null;
@@ -64,13 +62,11 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        if (repository.get(id) == null) {
+        Meal meal;
+        if ((meal = repository.get(id)) == null || meal.getUserId() != userId) {
             return null;
         }
-        if (repository.get(id).getUserId() != userId) {
-            return null;
-        }
-        return repository.get(id);
+        return meal;
     }
 
     private final Comparator<Meal> sort = (meal1, meal2) -> meal2.getDate().compareTo(meal1.getDate());

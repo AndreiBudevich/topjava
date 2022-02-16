@@ -32,7 +32,7 @@ public class MealService {
     }
 
     public List<Meal> getAll(int userId) {
-        return new ArrayList<>(repository.getAll(userId));
+        return repository.getAll(userId);
     }
 
     public List<Meal> getFilterList(LocalDate startDate, LocalDate endDate, int userId) {

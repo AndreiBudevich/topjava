@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import javax.servlet.ServletException;
@@ -21,19 +20,16 @@ import java.util.Objects;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
-    private MealRestController mealRestController;
     private ConfigurableApplicationContext appCtx;
-
+    private MealRestController mealRestController;
     @Override
     public void init() throws ServletException {
-        super.init();
-        ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
+        appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
         mealRestController = appCtx.getBean(MealRestController.class);
     }
 
     @Override
     public void destroy() {
-        super.destroy();
         appCtx.close();
     }
 
@@ -76,15 +72,12 @@ public class MealServlet extends HttpServlet {
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
             case "filter":
-                LocalDate startDate = DateTimeUtil.START_LOKAL_DATE_DEDEFAULT;
-                LocalDate endDate = DateTimeUtil.END_LOKAL_DATE_DEDEFAULT;
-                LocalTime startTime = DateTimeUtil.START_TIME;
-                LocalTime endTime = DateTimeUtil.END_TIME;
+                LocalDate startDate = null, endDate = null;
+                LocalTime startTime = null, endTime = null;
                 String startDateString = request.getParameter("startdate");
                 String endDateString = request.getParameter("enddate");
                 String startTimeString = request.getParameter("starttime");
                 String endTimeString = request.getParameter("endtime");
-
                 if (startDateString != null && !startDateString.isEmpty()) {
                     startDate = LocalDate.parse(startDateString);
                 }
