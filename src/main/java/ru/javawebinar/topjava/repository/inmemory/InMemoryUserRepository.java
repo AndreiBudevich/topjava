@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.repository.inmemory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import ru.javawebinar.topjava.model.AbstractNamedEntity;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
@@ -19,7 +20,8 @@ public class InMemoryUserRepository implements UserRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        save(new User(null, "Andrei", "budevich01@gmail.com", "mgreen02", 1800, false, EnumSet.of(Role.USER, Role.ADMIN)));
+        save(new User(null, "Andrei", "Budevich01@gmail.com", "mgreen02", 1800, false, EnumSet.of(Role.USER, Role.ADMIN)));
+        save(new User(null, "Andrei", "abudevi1@gmail.com", "mgreen02", 1800, false, EnumSet.of(Role.USER, Role.ADMIN)));
         save(new User(null, "Den", "vichac01@gmail.com", "mgreen03", 2800, true, EnumSet.of(Role.USER)));
     }
 
@@ -46,12 +48,15 @@ public class InMemoryUserRepository implements UserRepository {
         return repository.get(id);
     }
 
+    private final Comparator<User> sortName = Comparator.comparing(AbstractNamedEntity::getName);
+    private final Comparator<User> sortEmail = (user1, user2) -> user1.getEmail().compareToIgnoreCase(user2.getEmail());
+
     @Override
     public List<User> getAll() {
         log.info("getAll");
         return repository.values()
                 .stream()
-                .sorted((User1, User2) -> User1.getName().compareToIgnoreCase(User2.getName()))
+                .sorted(sortName.thenComparing(sortEmail))
                 .collect(Collectors.toList());
     }
 
@@ -62,7 +67,7 @@ public class InMemoryUserRepository implements UserRepository {
                 .stream()
                 .filter(user -> user.getEmail().equalsIgnoreCase(email))
                 .findFirst()
-                .get();
+                .orElse(null);
     }
 }
 
