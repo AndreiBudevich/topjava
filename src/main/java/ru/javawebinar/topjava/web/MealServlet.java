@@ -22,6 +22,7 @@ public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
     private ConfigurableApplicationContext appCtx;
     private MealRestController mealRestController;
+
     @Override
     public void init() throws ServletException {
         appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
@@ -72,24 +73,14 @@ public class MealServlet extends HttpServlet {
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
             case "filter":
-                LocalDate startDate = null, endDate = null;
-                LocalTime startTime = null, endTime = null;
                 String startDateString = request.getParameter("startdate");
                 String endDateString = request.getParameter("enddate");
                 String startTimeString = request.getParameter("starttime");
                 String endTimeString = request.getParameter("endtime");
-                if (startDateString != null && !startDateString.isEmpty()) {
-                    startDate = LocalDate.parse(startDateString);
-                }
-                if (endDateString != null && !endDateString.isEmpty()) {
-                    endDate = LocalDate.parse(endDateString);
-                }
-                if (startTimeString != null && !startTimeString.isEmpty()) {
-                    startTime = LocalTime.parse(startTimeString);
-                }
-                if (endTimeString != null && !endTimeString.isEmpty()) {
-                    endTime = LocalTime.parse(endTimeString);
-                }
+                LocalDate startDate = startDateString.equals("") ? null : LocalDate.parse(startDateString);
+                LocalDate endDate = endDateString.equals("") ? null : LocalDate.parse(endDateString);
+                LocalTime startTime = startTimeString.equals("") ? null : LocalTime.parse(startTimeString);
+                LocalTime endTime = endTimeString.equals("") ? null : LocalTime.parse(endTimeString);
                 request.setAttribute("meals", mealRestController.getFilterList(startDate, endDate, startTime, endTime));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
