@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.javawebinar.topjava.MyJUnitStopWatch;
+import ru.javawebinar.topjava.JUnitStopWatch;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
@@ -19,7 +19,7 @@ import java.time.Month;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
-import static ru.javawebinar.topjava.MyJUnitStopWatch.runAddAllMessageInLogAfterAllTest;
+import static ru.javawebinar.topjava.JUnitStopWatch.runAddAllMessageInLogAfterAllTest;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
@@ -35,7 +35,7 @@ public class MealServiceTest {
     private MealService service;
 
     @Rule
-    public MyJUnitStopWatch stopwatch = new MyJUnitStopWatch();
+    public JUnitStopWatch stopwatch = new JUnitStopWatch();
 
     @AfterClass
     public static void afterClass() {
