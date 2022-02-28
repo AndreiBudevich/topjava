@@ -10,19 +10,17 @@ import org.slf4j.LoggerFactory;
 
 public class JUnitStopWatch extends Stopwatch {
     private static final Logger log = LoggerFactory.getLogger(JUnitStopWatch.class);
-    private static final ArrayList<String> messageBuffers = new ArrayList<>();
+    private static String messageAll="\n";
 
     private static void logInfo(Description description, long nanos) {
         String testName = description.getMethodName();
         String message = String.format("%24s %4d ms", testName, TimeUnit.NANOSECONDS.toMillis(nanos));
         log.info(message);
-        messageBuffers.add(message);
+        messageAll += message + "\n";
     }
 
-    public static void runAddAllMessageInLogAfterAllTest() {
-        for (String message : messageBuffers) {
-            log.info(message);
-        }
+    public static void getFinalResponseAllTesTime() {
+        log.info(messageAll);
     }
 
     @Override

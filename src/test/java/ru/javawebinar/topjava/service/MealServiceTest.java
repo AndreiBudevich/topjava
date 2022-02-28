@@ -18,8 +18,8 @@ import java.time.LocalDate;
 import java.time.Month;
 
 import static org.junit.Assert.assertThrows;
+import static ru.javawebinar.topjava.JUnitStopWatch.getFinalResponseAllTesTime;
 import static ru.javawebinar.topjava.MealTestData.*;
-import static ru.javawebinar.topjava.JUnitStopWatch.runAddAllMessageInLogAfterAllTest;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
@@ -39,7 +39,7 @@ public class MealServiceTest {
 
     @AfterClass
     public static void afterClass() {
-        runAddAllMessageInLogAfterAllTest();
+        getFinalResponseAllTesTime();
     }
 
     @Test
