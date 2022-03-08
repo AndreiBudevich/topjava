@@ -13,7 +13,7 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -21,8 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.MealToTestData.MEAL_TO_MATCHER;
-import static ru.javawebinar.topjava.UserTestData.*;
-import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
+import static ru.javawebinar.topjava.UserTestData.USER_ID;
+import static ru.javawebinar.topjava.UserTestData.user;
 import static ru.javawebinar.topjava.util.MealsUtil.getTos;
 
 public class MealRestControllerTest extends AbstractControllerTest {
@@ -37,7 +37,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
         perform(MockMvcRequestBuilders.get(REST_URL + MEAL1_ID))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(MEAL_MATCHER.contentJson(mealService.get(MEAL1_ID, USER_ID)));
+                .andExpect(MEAL_MATCHER.contentJson(meal1));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(getTos(meals, DEFAULT_CALORIES_PER_DAY)));
+                .andExpect(MEAL_TO_MATCHER.contentJson(getTos(meals, user.getCaloriesPerDay())));
     }
 
     @Test
@@ -98,8 +98,8 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetweenWithNullDates() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + "filter")
-        ).andExpect(status().isOk())
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter"))
+                .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(MEAL_TO_MATCHER.contentJson(getTos(meals, user.getCaloriesPerDay())));
