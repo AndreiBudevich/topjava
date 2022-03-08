@@ -28,6 +28,7 @@ public abstract class ServiceTest {
     private static final Logger log = getLogger("result");
 
     private static final StringBuilder results = new StringBuilder();
+
     @Rule
     public final Stopwatch stopwatch = new Stopwatch() {
         @Override
