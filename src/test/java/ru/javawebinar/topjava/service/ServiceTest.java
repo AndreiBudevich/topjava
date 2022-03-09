@@ -27,7 +27,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public abstract class ServiceTest {
     private static final Logger log = getLogger("result");
 
-    private static final StringBuilder results = new StringBuilder();
+    private static StringBuilder results = new StringBuilder();
 
     @Rule
     public final Stopwatch stopwatch = new Stopwatch() {
@@ -46,5 +46,7 @@ public abstract class ServiceTest {
                 "\n---------------------------------" +
                 results +
                 "\n---------------------------------");
+        results = new StringBuilder();
     }
+
 }
