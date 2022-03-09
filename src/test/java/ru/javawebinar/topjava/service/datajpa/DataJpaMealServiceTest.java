@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.service.datajpa;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,11 +18,8 @@ public class DataJpaMealServiceTest extends MealServiceTest {
     @Test
     public void getMealWithUser() {
         Meal actual = service.getMealWithUser(ADMIN_MEAL_ID, ADMIN_ID);
-        adminMeal1.setUser(admin);
-        Assertions.assertThat(actual).
-                usingRecursiveComparison()
-                .ignoringFields("user.meals", "user.registered")
-                .isEqualTo(adminMeal1);
+        MEAL_MATCHER.assertMatch(actual, adminMeal1);
+        USER_MATCHER.assertMatch(actual.getUser(), admin);
     }
 
     @Test
