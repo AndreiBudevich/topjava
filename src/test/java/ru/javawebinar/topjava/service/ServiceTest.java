@@ -48,5 +48,4 @@ public abstract class ServiceTest {
                 "\n---------------------------------");
         results = new StringBuilder();
     }
-
 }
