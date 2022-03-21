@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
+import ru.javawebinar.topjava.util.CollectorUserRole;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -13,15 +14,6 @@ import java.util.List;
 @Repository
 @Transactional(readOnly = true)
 public class JpaUserRepository implements UserRepository {
-
-/*
-    @Autowired
-    private SessionFactory sessionFactory;
-
-    private Session openSession() {
-        return sessionFactory.getCurrentSession();
-    }
-*/
 
     @PersistenceContext
     private EntityManager em;
@@ -45,13 +37,6 @@ public class JpaUserRepository implements UserRepository {
     @Override
     @Transactional
     public boolean delete(int id) {
-
-/*      User ref = em.getReference(User.class, id);
-        em.remove(ref);
-
-        Query query = em.createQuery("DELETE FROM User u WHERE u.id=:id");
-        return query.setParameter("id", id).executeUpdate() != 0;
-*/
         return em.createNamedQuery(User.DELETE)
                 .setParameter("id", id)
                 .executeUpdate() != 0;
@@ -62,7 +47,11 @@ public class JpaUserRepository implements UserRepository {
         List<User> users = em.createNamedQuery(User.BY_EMAIL, User.class)
                 .setParameter(1, email)
                 .getResultList();
-        return DataAccessUtils.singleResult(users);
+        return DataAccessUtils.singleResult(getCollect(users));
+    }
+
+    private List<User> getCollect(List<User> users) {
+        return users.stream().collect(CollectorUserRole.toList());
     }
 
     @Override

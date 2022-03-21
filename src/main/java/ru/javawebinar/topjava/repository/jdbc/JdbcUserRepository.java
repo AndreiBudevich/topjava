@@ -13,22 +13,23 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
+import ru.javawebinar.topjava.util.CollectorUserRole;
 
+import javax.validation.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
 
 import static ru.javawebinar.topjava.repository.jdbc.JdbcUserRepository.Mapper.getMapper;
 
 @Repository
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
+
+    private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+
+    private final Validator validator = validatorFactory.getValidator();
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -49,6 +50,10 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException (violations);
+        }
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
@@ -110,50 +115,7 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     private List<User> getCollect(List<User> users) {
-        return users.stream().collect(CollectorRole.toList());
-    }
-
-    public static class CollectorRole implements Collector<User, Map<Integer, User>, List<User>> {
-        public static CollectorRole toList() {
-            return new CollectorRole();
-        }
-
-        @Override
-        public Supplier<Map<Integer, User>> supplier() {
-            return HashMap::new;
-        }
-
-        @Override
-        public BiConsumer<Map<Integer, User>, User> accumulator() {
-            Collection<Role> roles = new HashSet<>();
-            return (map, user) ->
-                    map.merge(user.id(), user, (user1, user2) -> {
-                        roles.addAll(user1.getRoles());
-                        roles.addAll(user2.getRoles());
-                        user1.setRoles(roles);
-                        return user1;
-                    });
-        }
-
-        @Override
-        public BinaryOperator<Map<Integer, User>> combiner() {
-            return (map1, map2) -> {
-                map1.putAll(map2);
-                return map1;
-            };
-        }
-
-        @Override
-        public Function<Map<Integer, User>, List<User>> finisher() {
-            return map -> map.values().stream()
-                    .sorted(Comparator.comparing(User::getName).thenComparing(User::getEmail))
-                    .toList();
-        }
-
-        @Override
-        public Set<Characteristics> characteristics() {
-            return Set.of(Characteristics.UNORDERED);
-        }
+        return users.stream().collect(CollectorUserRole.toList());
     }
 
     static class Mapper implements RowMapper<User> {
