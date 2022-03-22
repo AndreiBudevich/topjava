@@ -14,8 +14,8 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.CollectorUserRole;
+import ru.javawebinar.topjava.util.ValidationUtil;
 
-import javax.validation.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,10 +26,6 @@ import static ru.javawebinar.topjava.repository.jdbc.JdbcUserRepository.Mapper.g
 @Repository
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
-
-    private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-
-    private final Validator validator = validatorFactory.getValidator();
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -42,7 +38,6 @@ public class JdbcUserRepository implements UserRepository {
         this.insertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
-
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
@@ -50,10 +45,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException (violations);
-        }
+        ValidationUtil.validationEntity(user);
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
