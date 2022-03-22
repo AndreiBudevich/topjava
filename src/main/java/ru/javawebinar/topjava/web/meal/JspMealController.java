@@ -8,11 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
-import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,56 +22,50 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 
 @Controller
-@RequestMapping(value = "/meals")
+@RequestMapping("/meals")
 public class JspMealController extends MealController {
 
     public JspMealController(MealService service) {
         super(service);
     }
 
-    @GetMapping("")
-    public String get(Model model) {
-        int userId = SecurityUtil.authUserId();
-        log.info("getAll for user {}", userId);
-        model.addAttribute("meals", MealsUtil.getTos(service.getAll(userId), SecurityUtil.authUserCaloriesPerDay()));
+    @GetMapping
+    public String getAll(Model model) {
+        model.addAttribute("meals", getAll());
         return "meals";
     }
 
     @GetMapping("/delete")
     public String delete(HttpServletRequest request) {
-        int userId = SecurityUtil.authUserId();
-        int id = getId(request);
-        log.info("delete meal {} for user {}", id, userId);
-        service.delete(id, userId);
+        delete(getId(request));
         return "redirect:/meals";
     }
 
     @GetMapping("/update")
-    public String update(HttpServletRequest request, Model model) throws UnsupportedEncodingException {
+    public String update(HttpServletRequest request, Model model) {
         int userId = SecurityUtil.authUserId();
+        int id = getId(request);
         Meal meal = service.get(getId(request), userId);
+        update(meal, id, userId);
         model.addAttribute("meal", meal);
-        log.info("update {} for user {}", meal, userId);
         return "mealForm";
     }
 
     @GetMapping("/create")
-    public String create(Model model) throws UnsupportedEncodingException {
-        int userId = SecurityUtil.authUserId();
+    public String create(Model model) {
         Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
-        model.addAttribute("meal", meal);
-        log.info("create {} for user {}", meal, userId);
+        create(meal);
         return "mealForm";
     }
 
     @GetMapping("/filter")
-    public String filter(HttpServletRequest request, Model model) throws UnsupportedEncodingException {
+    public String filter(HttpServletRequest request, Model model) {
         int userId = SecurityUtil.authUserId();
         LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
         LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
         LocalTime endTime = parseLocalTime(request.getParameter("endTime"));
-        model.addAttribute("meals", getFilterParameter(startDate, endDate, startTime, endTime, userId));
+        model.addAttribute("meals", getBetween(startDate, endDate, startTime, endTime, userId));
         return "meals";
     }
 
