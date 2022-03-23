@@ -38,7 +38,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     private Environment environment;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         cacheManager.getCache("users").clear();
         if (environment.acceptsProfiles(Profiles.of(JDBC))) {
             return;
@@ -55,6 +55,17 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         USER_MATCHER.assertMatch(created, newUser);
         USER_MATCHER.assertMatch(service.get(newId), newUser);
     }
+
+    @Test
+    public void createWithoutRoles() {
+        User created = service.create(getNewWithoutRoles());
+        int newId = created.id();
+        User newUser = getNewWithoutRoles();
+        newUser.setId(newId);
+        USER_MATCHER.assertMatch(created, newUser);
+        USER_MATCHER.assertMatch(service.get(newId), newUser);
+    }
+
 
     @Test
     public void duplicateMailCreate() {
@@ -104,7 +115,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void createWithException() throws Exception {
+    public void createWithException() {
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "  ", "mail@yandex.ru", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "  ", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "  ", Role.USER)));

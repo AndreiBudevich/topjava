@@ -5,6 +5,7 @@ import ru.javawebinar.topjava.model.User;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
@@ -22,6 +23,10 @@ public class UserTestData {
 
     public static User getNew() {
         return new User(null, "New", "new@gmail.com", "newPass", 1555, false, new Date(), Collections.singleton(Role.USER));
+    }
+
+    public static User getNewWithoutRoles() {
+        return new User(null, "User1", "user1@yandex.ru", "password1", 1555, false, new Date(), new HashSet<>());
     }
 
     public static User getUpdated() {
