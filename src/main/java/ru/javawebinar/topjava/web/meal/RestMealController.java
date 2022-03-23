@@ -19,8 +19,9 @@ public class RestMealController extends MealController {
     }
 
     public Meal create(Meal meal) {
+        int userId = SecurityUtil.authUserId();
         checkNew(meal);
-        return super.create(meal);
+        return service.create(meal, userId);
     }
 
     public void update(Meal meal, int id) {

@@ -53,8 +53,10 @@ public class JspMealController extends MealController {
 
     @GetMapping("/create")
     public String create(Model model) {
+        int userId = SecurityUtil.authUserId();
         Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
-        create(meal);
+        super.create(meal, userId);
+        model.addAttribute("meal", meal);
         return "mealForm";
     }
 

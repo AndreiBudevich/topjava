@@ -44,10 +44,8 @@ public abstract class MealController {
         service.delete(id, userId);
     }
 
-    public Meal create(Meal meal) {
-        int userId = SecurityUtil.authUserId();
+    public void create(Meal meal, int userId) {
         log.info("create {} for user {}", meal, userId);
-        return service.create(meal, userId);
     }
 
     public void update(Meal meal, int id , int userId) {
