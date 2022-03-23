@@ -17,11 +17,8 @@ import ru.javawebinar.topjava.util.CollectorUserRole;
 import ru.javawebinar.topjava.util.ValidationUtil;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-
-import static ru.javawebinar.topjava.repository.jdbc.JdbcUserRepository.Mapper.getMapper;
 
 @Repository
 @Transactional(readOnly = true)
@@ -50,34 +47,40 @@ public class JdbcUserRepository implements UserRepository {
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
-        } else if (namedParameterJdbcTemplate.update("""
-                   UPDATE users SET name=:name, email=:email, password=:password, 
-                   registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
-                """, parameterSource) == 0) {
-            return null;
+        } else {
+            int update = namedParameterJdbcTemplate.update("""
+                       UPDATE users SET name=:name, email=:email, password=:password, 
+                       registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
+                    """, parameterSource);
+            if (update != 0) {
+                jdbcTemplate.update("DELETE FROM user_roles WHERE user_id = ?", user.getId());
+            } else {
+                return null;
+            }
         }
         batchUpdate(user);
         return user;
     }
 
     public void batchUpdate(User user) {
-        jdbcTemplate.update("DELETE FROM user_roles WHERE user_id = ?", user.getId());
         List<Role> roles = new ArrayList<>(user.getRoles());
-        jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) values (?, ?)", new BatchPreparedStatementSetter() {
-            public void setValues(PreparedStatement ps, int i)
-                    throws SQLException {
-                ps.setInt(1, user.id());
-                ps.setString(2, getStringRoles(roles.get(i)));
-            }
+        if (roles.size() > 0) {
+            jdbcTemplate.batchUpdate("INSERT INTO user_roles (user_id, role) values (?, ?)", new BatchPreparedStatementSetter() {
+                public void setValues(PreparedStatement ps, int i)
+                        throws SQLException {
+                    ps.setInt(1, user.id());
+                    ps.setString(2, getStringRoles(roles.get(i)));
+                }
 
-            public int getBatchSize() {
-                return roles.size();
-            }
-        });
+                public int getBatchSize() {
+                    return roles.size();
+                }
+            });
+        }
     }
 
     private static String getStringRoles(Role role) {
-        return role.equals(Role.USER) ? "USER" : "ADMIN";
+        return role.name();
     }
 
     @Override
@@ -89,62 +92,48 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public User get(int id) {
         List<User> users = jdbcTemplate.query(
-                "SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id WHERE id=?", getMapper(), id);
-        return DataAccessUtils.singleResult(getCollect(users));
+                "SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id WHERE id=?", mapper, id);
+        return DataAccessUtils.singleResult(getCollectedUsers(users));
     }
 
     @Override
     public User getByEmail(String email) {
         List<User> users = jdbcTemplate.query(
-                "SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id WHERE email=?", getMapper(), email);
-        return DataAccessUtils.singleResult(getCollect(users));
+                "SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id WHERE email=?", mapper, email);
+        return DataAccessUtils.singleResult(getCollectedUsers(users));
     }
 
     @Override
     public List<User> getAll() {
-        List<User> query = jdbcTemplate.query("SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id", getMapper());
-        return getCollect(query);
+        List<User> query = jdbcTemplate.query("SELECT * FROM users u  LEFT JOIN user_roles ur ON u.id = ur.user_id ORDER BY u.name, u.email", mapper);
+        return getCollectedUsers(query);
     }
 
-    private List<User> getCollect(List<User> users) {
+    private List<User> getCollectedUsers(List<User> users) {
         return users.stream().collect(CollectorUserRole.toList());
     }
 
-    static class Mapper implements RowMapper<User> {
-
-        private Mapper() {
+    private static final RowMapper<User> mapper = (rs, rowNum) -> {
+        User user = new User();
+        user.setId(rs.getInt("id"));
+        user.setName(rs.getString("name"));
+        user.setEmail(rs.getString("email"));
+        user.setPassword(rs.getString("password"));
+        user.setRegistered(rs.getDate("registered"));
+        user.setEnabled(rs.getBoolean("enabled"));
+        user.setCaloriesPerDay(rs.getInt("calories_per_day"));
+        String role = rs.getString("role");
+        if (role != null) {
+            user.setRoles(getRoles(role));
+        } else {
+            user.setRoles(new HashSet<>());
         }
+        return user;
+    };
 
-        private static class MapperHolder {
-            public static final Mapper HOLDER_INSTANCE = new Mapper();
-        }
-
-        public static Mapper getMapper() {
-            return MapperHolder.HOLDER_INSTANCE;
-        }
-
-        @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            User user = new User();
-            user.setId(rs.getInt("id"));
-            user.setName(rs.getString("name"));
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            user.setRegistered(rs.getDate("registered"));
-            user.setEnabled(rs.getBoolean("enabled"));
-            user.setCaloriesPerDay(rs.getInt("calories_per_day"));
-            String role = rs.getString("role");
-            if (role != null) {
-                user.setRoles(getRoles(role));
-            } else {
-                user.setRoles(new TreeSet<>());
-            }
-            return user;
-        }
-
-        private static Collection<Role> getRoles(String roleName) {
-            return roleName.equals(Role.USER.name()) ? List.of(Role.USER) : List.of(Role.ADMIN);
-        }
+    static Collection<Role> getRoles(String roleName) {
+        return Set.of(Role.valueOf(roleName));
     }
 }
+
 
