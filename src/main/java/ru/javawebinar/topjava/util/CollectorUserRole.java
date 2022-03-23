@@ -17,14 +17,14 @@ public class CollectorUserRole implements Collector<User, Map<Integer, User>, Li
 
     @Override
     public Supplier<Map<Integer, User>> supplier() {
-        return HashMap::new;
+        return LinkedHashMap::new;
     }
 
     @Override
     public BiConsumer<Map<Integer, User>, User> accumulator() {
-        Collection<Role> roles = new HashSet<>();
         return (map, user) ->
                 map.merge(user.id(), user, (user1, user2) -> {
+                    Collection<Role> roles = Collections.synchronizedSet(EnumSet.noneOf(Role.class));
                     roles.addAll(user1.getRoles());
                     roles.addAll(user2.getRoles());
                     user1.setRoles(roles);
@@ -35,16 +35,13 @@ public class CollectorUserRole implements Collector<User, Map<Integer, User>, Li
     @Override
     public BinaryOperator<Map<Integer, User>> combiner() {
         return (map1, map2) -> {
-            map1.putAll(map2);
-            return map1;
+            throw new UnsupportedOperationException();
         };
     }
 
     @Override
     public Function<Map<Integer, User>, List<User>> finisher() {
-        return map -> map.values().stream()
-                .sorted(Comparator.comparing(User::getName).thenComparing(User::getEmail))
-                .toList();
+        return map -> map.values().stream().toList();
     }
 
     @Override
