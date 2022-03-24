@@ -79,7 +79,6 @@ public class JspMealController extends MealController {
                 request.getParameter("description"),
                 Integer.parseInt(request.getParameter("calories")));
         if (StringUtils.hasLength(request.getParameter("id"))) {
-            assureIdConsistent(meal, getId(request));
             service.update(meal, userId);
         } else {
             service.create(meal, userId);

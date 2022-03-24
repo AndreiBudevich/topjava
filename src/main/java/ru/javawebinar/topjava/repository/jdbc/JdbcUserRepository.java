@@ -69,7 +69,7 @@ public class JdbcUserRepository implements UserRepository {
                 public void setValues(PreparedStatement ps, int i)
                         throws SQLException {
                     ps.setInt(1, user.id());
-                    ps.setString(2, getStringRoles(roles.get(i)));
+                    ps.setString(2, roles.get(i).name());
                 }
 
                 public int getBatchSize() {
@@ -77,10 +77,6 @@ public class JdbcUserRepository implements UserRepository {
                 }
             });
         }
-    }
-
-    private static String getStringRoles(Role role) {
-        return role.name();
     }
 
     @Override
@@ -92,20 +88,20 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public User get(int id) {
         List<User> users = jdbcTemplate.query(
-                "SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id WHERE id=?", mapper, id);
+                "SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id WHERE id=?", MAPPER, id);
         return DataAccessUtils.singleResult(getCollectedUsers(users));
     }
 
     @Override
     public User getByEmail(String email) {
         List<User> users = jdbcTemplate.query(
-                "SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id WHERE email=?", mapper, email);
+                "SELECT * FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id WHERE email=?", MAPPER, email);
         return DataAccessUtils.singleResult(getCollectedUsers(users));
     }
 
     @Override
     public List<User> getAll() {
-        List<User> query = jdbcTemplate.query("SELECT * FROM users u  LEFT JOIN user_roles ur ON u.id = ur.user_id ORDER BY u.name, u.email", mapper);
+        List<User> query = jdbcTemplate.query("SELECT * FROM users u  LEFT JOIN user_roles ur ON u.id = ur.user_id ORDER BY u.name, u.email", MAPPER);
         return getCollectedUsers(query);
     }
 
@@ -113,7 +109,7 @@ public class JdbcUserRepository implements UserRepository {
         return users.stream().collect(CollectorUserRole.toList());
     }
 
-    private static final RowMapper<User> mapper = (rs, rowNum) -> {
+    private static final RowMapper<User> MAPPER = (rs, rowNum) -> {
         User user = new User();
         user.setId(rs.getInt("id"));
         user.setName(rs.getString("name"));
@@ -124,16 +120,12 @@ public class JdbcUserRepository implements UserRepository {
         user.setCaloriesPerDay(rs.getInt("calories_per_day"));
         String role = rs.getString("role");
         if (role != null) {
-            user.setRoles(getRoles(role));
+            user.setRoles(EnumSet.of(Role.valueOf(role)));
         } else {
             user.setRoles(new HashSet<>());
         }
         return user;
     };
-
-    static Collection<Role> getRoles(String roleName) {
-        return Set.of(Role.valueOf(roleName));
-    }
 }
 
 
