@@ -24,7 +24,7 @@ public class CollectorUserRole implements Collector<User, Map<Integer, User>, Li
     public BiConsumer<Map<Integer, User>, User> accumulator() {
         return (map, user) ->
                 map.merge(user.id(), user, (user1, user2) -> {
-                    Collection<Role> roles = Collections.synchronizedSet(EnumSet.noneOf(Role.class));
+                    Collection<Role> roles = EnumSet.noneOf(Role.class);
                     roles.addAll(user1.getRoles());
                     roles.addAll(user2.getRoles());
                     user1.setRoles(roles);
@@ -41,11 +41,11 @@ public class CollectorUserRole implements Collector<User, Map<Integer, User>, Li
 
     @Override
     public Function<Map<Integer, User>, List<User>> finisher() {
-        return map -> map.values().stream().toList();
+        return map -> new ArrayList<>(map.values());
     }
 
     @Override
     public Set<Characteristics> characteristics() {
-        return Set.of(Characteristics.UNORDERED);
+        return Set.of();
     }
 }
