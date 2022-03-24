@@ -10,9 +10,8 @@ import javax.validation.*;
 import java.util.Set;
 
 public class ValidationUtil {
-    protected static final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 
-    protected static final Validator validator = validatorFactory.getValidator();
+    protected static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     private ValidationUtil() {
     }
