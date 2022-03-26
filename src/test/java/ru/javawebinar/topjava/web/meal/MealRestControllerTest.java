@@ -78,12 +78,23 @@ public class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void getBetween() throws Exception {
         perform(get(REST_URL + "filter")
-                .param("startDateTime", "2020-01-30T00:00:00")
-                .param("endDateTime", "2020-01-30T20:00:00")
+                .param("startDate", "2020-01-30")
+                .param("startTime", "00:00")
+                .param("endDate", "2020-01-30")
+                .param("endTime", "20:00")
         ).andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(MEAL_TO_MATCHER.contentJson(getTos(List.of(meal2, meal1), DEFAULT_CALORIES_PER_DAY)));
+    }
+
+    @Test
+    void getBetweenWithNullDates() throws Exception {
+        perform(get(REST_URL + "filter")
+        ).andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(MEAL_TO_MATCHER.contentJson(getTos(meals, DEFAULT_CALORIES_PER_DAY)));
     }
 }
 
