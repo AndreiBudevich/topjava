@@ -1,8 +1,10 @@
 package ru.javawebinar.topjava.web.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.UserTestData;
@@ -12,11 +14,15 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.*;
+
 
 class AdminRestControllerTest extends AbstractControllerTest {
 
@@ -24,6 +30,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    ObjectMapper mapper;
 
     @Test
     void get() throws Exception {
@@ -83,5 +92,18 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(admin, guest, user));
+    }
+
+    @Test
+    void getWithMeals() throws Exception {
+        MvcResult mvcResult = perform(MockMvcRequestBuilders.get(REST_URL + "with-meals/" + ADMIN_ID))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        User actual = mapper.readerFor(User.class).readValue(contentAsString);
+        USER_MATCHER.assertMatch(actual, admin);
+        MEAL_MATCHER.assertMatch(actual.getMeals(), List.of(adminMeal2, adminMeal1));
     }
 }
