@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava.to;
 
+import org.hibernate.Hibernate;
+
 import java.beans.ConstructorProperties;
 import java.time.LocalDateTime;
 
@@ -52,5 +54,22 @@ public class MealTo {
                 ", calories=" + calories +
                 ", excess=" + excess +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || !getClass().equals(Hibernate.getClass(obj))) {
+            return false;
+        }
+        MealTo o = (MealTo) obj;
+
+        return this.id.equals(o.id)
+                && this.dateTime.equals(o.dateTime)
+                && this.description.equals(o.description)
+                && this.calories == o.calories
+                && this.excess == o.excess;
     }
 }
