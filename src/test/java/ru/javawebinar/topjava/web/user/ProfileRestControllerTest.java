@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
@@ -14,12 +13,10 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.javawebinar.topjava.MealTestData.meals;
-import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
 import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_URL;
 
-class ProfileRestControllerTest extends AbstractControllerTest {
+public class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Autowired
     private UserService userService;
@@ -51,18 +48,5 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         USER_MATCHER.assertMatch(userService.get(USER_ID), updated);
-    }
-
-    @Test
-    void getWithMeals() throws Exception {
-        MvcResult mvcResult = perform(MockMvcRequestBuilders.get(REST_URL + "/with-meals"))
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andReturn();
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        User actual = mapper.readerFor(User.class).readValue(contentAsString);
-        USER_MATCHER.assertMatch(actual, user);
-        MEAL_MATCHER.assertMatch(actual.getMeals(), meals);
     }
 }
