@@ -4,7 +4,6 @@ import org.springframework.format.Formatter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,7 +14,6 @@ import java.util.Locale;
 public class DateTimeUtil {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    // DB doesn't support LocalDate.MIN/MAX
     private static final LocalDateTime MIN_DATE = LocalDateTime.of(1, 1, 1, 0, 0);
     private static final LocalDateTime MAX_DATE = LocalDateTime.of(3000, 1, 1, 0, 0);
 
@@ -47,26 +45,26 @@ public class DateTimeUtil {
     public static class LocalDateFormatter implements Formatter<LocalDate> {
 
         @Override
-        public LocalDate parse(String text, Locale locale) throws ParseException {
+        public LocalDate parse(String text, Locale locale) {
             return parseLocalDate(text);
         }
 
         @Override
         public String print(LocalDate localDate, Locale locale) {
-            return localDate.format(DateTimeFormatter.ISO_DATE_TIME);
+            return localDate.format(DateTimeFormatter.ISO_DATE);
         }
     }
 
     public static class LocalTimeFormatter implements Formatter<LocalTime> {
 
         @Override
-        public LocalTime parse(String text, Locale locale) throws ParseException {
+        public LocalTime parse(String text, Locale locale) {
             return parseLocalTime(text);
         }
 
         @Override
         public String print(LocalTime localTime, Locale locale) {
-            return localTime.format(DateTimeFormatter.ISO_DATE_TIME);
+            return localTime.format(DateTimeFormatter.ISO_TIME);
         }
     }
 }
