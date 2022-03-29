@@ -15,7 +15,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -32,6 +31,14 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
     @Autowired
     private MealService mealService;
+
+    @Test
+    void get() throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL + MEAL1_ID))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(MEAL_MATCHER.contentJson(mealService.get(MEAL1_ID, USER_ID)));
+    }
 
     @Test
     void delete() throws Exception {
@@ -53,7 +60,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getAll() throws Exception {
-        perform(get(REST_URL))
+        perform(MockMvcRequestBuilders.get(REST_URL))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -77,7 +84,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetween() throws Exception {
-        perform(get(REST_URL + "filter")
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter")
                 .param("startDate", "2020-01-30")
                 .param("startTime", "00:00")
                 .param("endDate", "2020-01-30")
@@ -90,7 +97,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetweenWithNullDates() throws Exception {
-        perform(get(REST_URL + "filter")
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter")
         ).andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))

@@ -27,12 +27,19 @@ public class MealRestController extends AbstractMealController {
         return super.getAll();
     }
 
+    @Override
+    @GetMapping("/{id}")
+    public Meal get(@PathVariable int id) {
+        return super.get(id);
+    }
+
+    @Override
     @GetMapping("/filter")
     public List<MealTo> getBetween(
-            @RequestParam(value = "startDate", required = false) LocalDate startDate,
-            @RequestParam(value = "startTime", required = false) LocalTime startTime,
-            @RequestParam(value = "endDate", required = false) LocalDate endDate,
-            @RequestParam(value = "endTime", required = false) LocalTime endTime
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalTime startTime,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) LocalTime endTime
     ) {
         return super.getBetween(startDate, startTime, endDate, endTime);
     }
