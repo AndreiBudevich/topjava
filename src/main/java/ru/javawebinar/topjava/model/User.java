@@ -74,9 +74,6 @@ public class User extends AbstractNamedEntity {
     @OrderBy("dateTime DESC")
     @OnDelete(action = OnDeleteAction.CASCADE) //https://stackoverflow.com/a/44988100/548473
     @JsonManagedReference
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            property = "id")
     private List<Meal> meals;
 
     public User() {
