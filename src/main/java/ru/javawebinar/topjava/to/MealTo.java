@@ -1,9 +1,8 @@
 package ru.javawebinar.topjava.to;
 
-import org.hibernate.Hibernate;
-
 import java.beans.ConstructorProperties;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class MealTo {
     private final Integer id;
@@ -61,15 +60,30 @@ public class MealTo {
         if (this == obj) {
             return true;
         }
-        if (obj == null || !getClass().equals(Hibernate.getClass(obj))) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
+
         MealTo o = (MealTo) obj;
 
-        return this.id.equals(o.id)
-                && this.dateTime.equals(o.dateTime)
-                && this.description.equals(o.description)
-                && this.calories == o.calories
-                && this.excess == o.excess;
+        if (calories != o.calories || excess == o.excess) {
+            return false;
+        }
+
+        return Objects.equals(id, o.id) && Objects.equals(description, o.description) && Objects.equals(dateTime, o.dateTime);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + calories;
+        result = prime * result + Boolean.hashCode(excess);
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((dateTime == null) ? 0 : dateTime.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        return result;
     }
 }
+
+
