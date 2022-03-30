@@ -1,6 +1,6 @@
 package ru.javawebinar.topjava.web.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,9 +29,6 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    ObjectMapper mapper;
 
     @Test
     void get() throws Exception {
@@ -95,6 +92,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getWithMeals() throws Exception {
+        Assumptions.assumeTrue(isDataJpaBased(), "Validation not supported (DADA_JPA only)");
         perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID + "/with-meals"))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -104,4 +102,3 @@ class AdminRestControllerTest extends AbstractControllerTest {
         MatcherFactory.usingIgnoringFieldsComparator(Meal.class).contentJson(adminMeal2, adminMeal1);
     }
 }
-
