@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.MatcherFactory;
-import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
@@ -15,7 +15,6 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.javawebinar.topjava.MealTestData.meals;
 import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_URL;
 
@@ -52,12 +51,11 @@ public class ProfileRestControllerTest extends AbstractControllerTest {
     @Test
     void getWithMeals() throws Exception {
         Assumptions.assumeTrue(isDataJpaBased(), "Validation not supported (DADA_JPA only)");
-        perform(MockMvcRequestBuilders.get(REST_URL + "/with-meals"))
+        ResultActions resultActions = perform(MockMvcRequestBuilders.get(REST_URL + "/with-meals"))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andReturn();
-        MatcherFactory.usingIgnoringFieldsComparator(User.class).contentJson(user);
-        MatcherFactory.usingIgnoringFieldsComparator(Meal.class).contentJson(meals);
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+        User actualUser = MatcherFactory.usingIgnoringFieldsComparator(User.class).readFromJson(resultActions);
+        USER_MATCHER.assertMatch(actualUser, user);
     }
 }
