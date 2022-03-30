@@ -9,8 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import static ru.javawebinar.topjava.UserTestData.admin;
-import static ru.javawebinar.topjava.UserTestData.user;
+import static ru.javawebinar.topjava.UserTestData.*;
 
 
 @Repository
@@ -20,7 +19,8 @@ public class InMemoryUserRepository extends InMemoryBaseRepository<User> impleme
         map.clear();
         put(user);
         put(admin);
-        counter.getAndSet(UserTestData.ADMIN_ID + 1);
+        put(guest);
+        counter.getAndSet(UserTestData.GUEST_ID + 1);
     }
 
     @Override
