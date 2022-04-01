@@ -23,6 +23,14 @@ tr[data-meal-excess="true"] {
     color: red;
 }
 
+.green-or-red-color [data-meal-excess="true"] {
+    color: red;
+}
+
+.green-or-red-color [data-meal-excess="false"] {
+    color: green;
+}
+
 .fa {
     cursor: pointer;
 }
@@ -32,9 +40,11 @@ html {
     position: relative;
     min-height: 100%;
 }
+
 body {
     margin-bottom: 60px !important; /* Margin bottom by footer height */
 }
+
 .footer {
     position: absolute;
     bottom: 0;
