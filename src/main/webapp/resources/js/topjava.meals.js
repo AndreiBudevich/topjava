@@ -1,3 +1,5 @@
+let formFilter;
+
 const mealAjaxUrl = "profile/meals/";
 
 const ctx = {
@@ -37,3 +39,22 @@ $(function () {
         })
     );
 });
+
+function filter() {
+    formFilter = $('#filterForm');
+    $.ajax({
+        url: mealAjaxUrl + "filter",
+        type: "GET",
+        data: formFilter.serialize()
+    }).done(function (data) {
+        ctx.datatableApi.clear().rows.add(data).draw();
+        successNoty("filter");
+    });
+}
+
+function clearFilter() {
+    $.get(mealAjaxUrl, function (data) {
+        $('#filterForm').trigger("reset");
+        ctx.datatableApi.clear().rows.add(data).draw();
+    });
+}
