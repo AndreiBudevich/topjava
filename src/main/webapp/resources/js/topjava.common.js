@@ -1,22 +1,3 @@
-let form;
-
-function makeEditable(datatableApi) {
-    ctx.datatableApi = datatableApi;
-    form = $('#detailsForm');
-    $(".delete").click(function () {
-        if (confirm('Are you sure?')) {
-            deleteRow($(this).closest('tr').attr("id"));
-        }
-    });
-
-    $(document).ajaxError(function (event, jqXHR, options, jsExc) {
-        failNoty(jqXHR);
-    });
-
-    // solve problem with cache in IE: https://stackoverflow.com/a/4303862/548473
-    $.ajaxSetup({cache: false});
-}
-
 function add() {
     form.find(":input").val("");
     $("#editRow").modal();
@@ -78,3 +59,4 @@ function failNoty(jqXHR) {
     });
     failedNote.show()
 }
+

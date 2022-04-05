@@ -12,11 +12,13 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.UserTestData.*;
+import static ru.javawebinar.topjava.web.user.AdminUIController.UI_URL;
 
 class AdminRestControllerTest extends AbstractControllerTest {
 
@@ -93,5 +95,14 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_WITH_MEALS_MATCHER.contentJson(admin));
+    }
+
+    @Test
+    void unable() throws Exception {
+        perform(MockMvcRequestBuilders.post(UI_URL + "/" + USER_ID)
+                .param("enabled", "false"))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+        assertFalse(userService.get(USER_ID).isEnabled());
     }
 }

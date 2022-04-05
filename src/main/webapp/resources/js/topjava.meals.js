@@ -1,4 +1,5 @@
 let formFilter;
+let form;
 
 const mealAjaxUrl = "profile/meals/";
 
@@ -39,6 +40,22 @@ $(function () {
         })
     );
 });
+
+function makeEditable(datatableApi) {
+    ctx.datatableApi = datatableApi;
+    form = $('#detailsForm');
+    $(".delete").click(function () {
+        if (confirm('Are you sure?')) {
+            deleteRow($(this).closest('tr').attr("id"));
+        }
+    });
+
+    $(document).ajaxError(function (event, jqXHR, options, jsExc) {
+        failNoty(jqXHR);
+    });
+
+    $.ajaxSetup({cache: false});
+}
 
 function filter() {
     formFilter = $('#filterForm');
