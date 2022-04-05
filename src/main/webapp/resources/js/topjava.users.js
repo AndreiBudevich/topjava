@@ -39,7 +39,7 @@ function makeEditable(datatableApi) {
     });
 
     $('#userForm :checkbox').change(function () {
-        enable($(this).closest('tr').attr("id"), $(this).is(":checked"));
+        enable($(this));
     });
 
     $(document).ajaxError(function (event, jqXHR, options, jsExc) {
@@ -49,13 +49,17 @@ function makeEditable(datatableApi) {
     $.ajaxSetup({cache: false});
 }
 
-function enable(id, checked) {
+function enable(checkbox) {
+    const enable = checkbox.is(":checked");
+    const id = checkbox.closest('tr').attr("id");
     $.ajax({
         url: ctx.ajaxUrl + id,
         type: "POST",
-        data: {enabled: checked},
+        data: {enabled: enable},
     }).done(function () {
-        updateTable();
-        successNoty("enable User");
-    });
+        checkbox.closest('tr').attr("data-user-enabled", enable);
+        successNoty(enable ? "Record enabled" : "Record disabled");
+    }).fail(function () {
+        successNoty("didn't change");
+    })
 }
