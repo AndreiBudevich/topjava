@@ -1,5 +1,4 @@
 let form;
-let userForm;
 
 const userAjaxUrl = "admin/users/";
 
@@ -7,9 +6,8 @@ const ctx = {
     ajaxUrl: userAjaxUrl
 };
 
-// $(document).ready(function () {
 $(function () {
-    makeEditable($("#datatable").DataTable({
+    makeEditableUser($("#datatable").DataTable({
         "paging": false, "info": true, "columns": [{
             "data": "name"
         }, {
@@ -28,25 +26,11 @@ $(function () {
     }));
 });
 
-function makeEditable(datatableApi) {
-    ctx.datatableApi = datatableApi;
-    form = $('#detailsForm');
-    userForm = $('#userForm');
-    $(".delete").click(function () {
-        if (confirm('Are you sure?')) {
-            deleteRow($(this).closest('tr').attr("id"));
-        }
-    });
-
-    $('#userForm :checkbox').change(function () {
+function makeEditableUser(datatableApi) {
+    makeEditable(datatableApi)
+    $('#datatable :checkbox').change(function () {
         enable($(this));
     });
-
-    $(document).ajaxError(function (event, jqXHR, options, jsExc) {
-        failNoty(jqXHR);
-    });
-
-    $.ajaxSetup({cache: false});
 }
 
 function enable(checkbox) {
@@ -60,6 +44,7 @@ function enable(checkbox) {
         checkbox.closest('tr').attr("data-user-enabled", enable);
         successNoty(enable ? "Record enabled" : "Record disabled");
     }).fail(function () {
+        checkbox.prop('checked', !!checkbox);
         successNoty("didn't change");
     })
 }

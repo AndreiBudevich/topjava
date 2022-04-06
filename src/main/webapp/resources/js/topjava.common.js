@@ -1,3 +1,19 @@
+function makeEditable(datatableApi) {
+    ctx.datatableApi = datatableApi;
+    form = $('#detailsForm');
+    $(".delete").click(function () {
+        if (confirm('Are you sure?')) {
+            deleteRow($(this).closest('tr').attr("id"));
+        }
+    });
+
+    $(document).ajaxError(function (event, jqXHR, options, jsExc) {
+        failNoty(jqXHR);
+    });
+
+    $.ajaxSetup({cache: false});
+}
+
 function add() {
     form.find(":input").val("");
     $("#editRow").modal();
@@ -15,7 +31,7 @@ function deleteRow(id) {
 
 function updateTable() {
     $.get(ctx.ajaxUrl, function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
+        fillDataTable(data);
     });
 }
 
@@ -60,3 +76,6 @@ function failNoty(jqXHR) {
     failedNote.show()
 }
 
+function fillDataTable(data) {
+    ctx.datatableApi.clear().rows.add(data).draw();
+}

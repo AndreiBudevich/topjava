@@ -41,22 +41,6 @@ $(function () {
     );
 });
 
-function makeEditable(datatableApi) {
-    ctx.datatableApi = datatableApi;
-    form = $('#detailsForm');
-    $(".delete").click(function () {
-        if (confirm('Are you sure?')) {
-            deleteRow($(this).closest('tr').attr("id"));
-        }
-    });
-
-    $(document).ajaxError(function (event, jqXHR, options, jsExc) {
-        failNoty(jqXHR);
-    });
-
-    $.ajaxSetup({cache: false});
-}
-
 function filter() {
     formFilter = $('#filterForm');
     $.ajax({
@@ -64,7 +48,7 @@ function filter() {
         type: "GET",
         data: formFilter.serialize()
     }).done(function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
+        fillDataTable(data)
         successNoty("filter");
     });
 }
@@ -72,6 +56,6 @@ function filter() {
 function clearFilter() {
     $.get(mealAjaxUrl, function (data) {
         $('#filterForm').trigger("reset");
-        ctx.datatableApi.clear().rows.add(data).draw();
+        fillDataTable(data);
     });
 }
