@@ -17,37 +17,32 @@
             <span class="fa fa-plus"></span>
             <spring:message code="common.add"/>
         </button>
-        <form id="userForm">
-            <table class="table table-striped" id="datatable">
-                <thead>
-                <tr>
-                    <th><spring:message code="user.name"/></th>
-                    <th><spring:message code="user.email"/></th>
-                    <th><spring:message code="user.roles"/></th>
-                    <th><spring:message code="user.active"/></th>
-                    <th><spring:message code="user.registered"/></th>
-                    <th></th>
-                    <th></th>
+        <table class="table table-striped" id="datatable">
+            <thead>
+            <tr>
+                <th><spring:message code="user.name"/></th>
+                <th><spring:message code="user.email"/></th>
+                <th><spring:message code="user.roles"/></th>
+                <th><spring:message code="user.active"/></th>
+                <th><spring:message code="user.registered"/></th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <c:forEach items="${requestScope.users}" var="user">
+                <jsp:useBean id="user" type="ru.javawebinar.topjava.model.User"/>
+                <tr id="${user.id}" data-user-enabled="${user.enabled}">
+                    <td><c:out value="${user.name}"/></td>
+                    <td><a href="mailto:${user.email}">${user.email}</a></td>
+                    <td>${user.roles}</td>
+                    <td><input type="checkbox" <c:if test="${user.enabled}">checked</c:if>/></td>
+                    <td><fmt:formatDate value="${user.registered}" pattern="dd-MMMM-yyyy"/></td>
+                    <td><a><span class="fa fa-pencil"></span></a></td>
+                    <td><a class="delete"><span class="fa fa-remove" data-user-enabled="${user.enabled}"></span></a>
+                    </td>
                 </tr>
-                </thead>
-                <c:forEach items="${requestScope.users}" var="user">
-                    <jsp:useBean id="user" type="ru.javawebinar.topjava.model.User"/>
-                    <tr id="${user.id}" data-user-enabled="${user.enabled}">
-                        <td><c:out value="${user.name}"/></td>
-                        <td><i class="icon-cog red-color"><a href="mailto:${user.email}"
-                                                             data-user-enabled="${user.enabled}">${user.email}</a></i>
-                        </td>
-                        <td>${user.roles}</td>
-                        <td><input type="checkbox" <c:if test="${user.enabled}">checked</c:if>/></td>
-                        <td><fmt:formatDate value="${user.registered}" pattern="dd-MMMM-yyyy"/></td>
-                        <td><a><span class="fa fa-pencil"></span></a></td>
-                        <td><a class="delete"><i class="icon-cog red-color"><span class="fa fa-remove"
-                                                                                  data-user-enabled="${user.enabled}"></span></i></a>
-                        </td>
-                    </tr>
-                </c:forEach>
-            </table>
-        </form>
+            </c:forEach>
+        </table>
     </div>
 </div>
 

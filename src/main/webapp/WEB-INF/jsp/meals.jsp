@@ -69,8 +69,7 @@
                     <td><c:out value="${meal.description}"/></td>
                     <td><c:out value="${meal.calories}"/></td>
                     <td><a><span class="fa fa-pencil"></span></a></td>
-                    <td><a class="delete"><i class="icon-cog green-or-red-color"><span class="fa fa-remove"
-                                                                                       data-meal-excess="${meal.excess}"></span></i></a>
+                    <td><a class="delete"><span class="fa fa-remove" data-meal-excess="${meal.excess}"></span></a>
                     </td>
                 </tr>
             </c:forEach>

@@ -31,14 +31,6 @@ tr[data-user-enabled="false"] {
     color: red;
 }
 
-.green-or-red-color [data-meal-excess="true"] {
-    color: red;
-}
-
-.green-or-red-color [data-meal-excess="false"] {
-    color: green;
-}
-
 .fa {
     cursor: pointer;
 }
