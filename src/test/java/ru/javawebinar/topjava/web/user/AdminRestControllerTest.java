@@ -18,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.UserTestData.*;
-import static ru.javawebinar.topjava.web.user.AdminUIController.UI_URL;
 
 class AdminRestControllerTest extends AbstractControllerTest {
 
@@ -99,7 +98,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void unable() throws Exception {
-        perform(MockMvcRequestBuilders.post(REST_URL + "/" + USER_ID)
+        perform(MockMvcRequestBuilders.patch(REST_URL + "/" + USER_ID)
                 .param("enabled", "false"))
                 .andDo(print())
                 .andExpect(status().isNoContent());

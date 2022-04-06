@@ -27,10 +27,6 @@ tr[data-user-enabled="false"] {
     color: red;
 }
 
-.red-color [data-user-enabled="false"] {
-    color: red;
-}
-
 .fa {
     cursor: pointer;
 }
