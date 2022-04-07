@@ -44,7 +44,7 @@ function enable(checkbox) {
         checkbox.closest('tr').attr("data-user-enabled", enable);
         successNoty(enable ? "Record enabled" : "Record disabled");
     }).fail(function () {
-        checkbox.prop('checked', !checkbox.is(":checked"));
+        checkbox.prop('checked', !enable);
         successNoty("didn't change");
     })
 }
