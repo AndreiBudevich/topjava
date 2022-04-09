@@ -84,6 +84,13 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void getAllAnAuth() throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL))
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
     void getBetween() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + "filter")
                 .param("startDate", "2020-01-30").param("startTime", "07:00")
