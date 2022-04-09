@@ -1,6 +1,6 @@
 const mealAjaxUrl = "profile/meals/";
 
-// https://stackoverflow.com/a/5064235/548473
+
 const ctx = {
     ajaxUrl: mealAjaxUrl,
     updateTable: function () {
@@ -20,25 +20,37 @@ function clearFilter() {
 $(function () {
     makeEditable(
         $("#datatable").DataTable({
+            "ajax": {
+                "url": mealAjaxUrl,
+                "dataSrc": ""
+            },
             "paging": false,
             "info": true,
             "columns": [
                 {
-                    "data": "dateTime"
+                    "data": "dateTime",
+                    "render": function (date, type) {
+                        if (type === "display") {
+                            return date.replace("T", " ").substring(0, 16);
+                        }
+                        return date;
+                    }
                 },
                 {
-                    "data": "description"
+                    "data": "description",
                 },
                 {
-                    "data": "calories"
+                    "data": "calories",
                 },
                 {
                     "defaultContent": "Edit",
-                    "orderable": false
+                    "orderable": false,
+                    "render": renderEditBtn
                 },
                 {
                     "defaultContent": "Delete",
-                    "orderable": false
+                    "orderable": false,
+                    "render": renderDeleteBtn
                 }
             ],
             "order": [
@@ -46,7 +58,13 @@ $(function () {
                     0,
                     "desc"
                 ]
-            ]
+            ],
+            "createdRow": function (row, data) {
+                if (data.excess) {
+                    $(row).attr("data-meal-excess", true);
+                } else $(row).attr("data-meal-excess", false);
+            }
         })
     );
 });
+
