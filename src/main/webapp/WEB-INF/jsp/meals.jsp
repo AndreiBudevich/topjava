@@ -6,7 +6,8 @@
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
 
-<link rel="stylesheet" type="text/css" href="webjars/datetimepicker/2.5.20-1/jquery.datetimepicker.css"/ >
+<link rel="stylesheet" type="text/css" href="webjars/datetimepicker/2.5.20-1/jquery.datetimepicker.css"
+/ >
 <script src="webjars/datetimepicker/2.5.20-1/jquery.js"></script>
 <script src="webjars/datetimepicker/2.5.20-1/build/jquery.datetimepicker.full.js"></script>
 
@@ -82,6 +83,8 @@
                 <form id="detailsForm">
                     <input type="hidden" id="id" name="id">
                     <div class="form-group">
+                        <label for="description" class="col-form-label"><spring:message
+                                code="meal.dateTime"/></label>
                         <input type="text" id="dateTime" name="dateTime">
                     </div>
                     <div class="form-group">
@@ -113,21 +116,27 @@
 </body>
 <script>
     $('#dateTime').datetimepicker({
-        inline: true,
-    });
-    $('#startDate').datetimepicker({
+        format: 'Y-m-d H:i',
+        formatTime: 'H:i',
+    })
+    ;
+    const startDate = $('#startDate');
+    startDate.datetimepicker({
         format: 'Y-m-d',
         timepicker: false
     });
     $('#endDate').datetimepicker({
+        minDate : startDate.val(),
         format: 'Y-m-d',
         timepicker: false
     });
-    $('#startTime').datetimepicker({
+    const startTime = $('#startTime');
+    startTime.datetimepicker({
         datepicker: false,
         format: 'H:m',
     });
     $('#endTime').datetimepicker({
+        minTime : startTime.val(),
         datepicker: false,
         format: 'H:m',
     });
