@@ -21,8 +21,9 @@ public class GlobalExceptionHandler extends AbstractExceptionHandler {
         log.error("Exception at request " + req.getRequestURL(), e);
         Throwable rootCause = ValidationUtil.getRootCause(e);
         String message = rootCause.toString();
-        if (checkUniqueEmailError(e)) {
-            message = getUniqueEmailError();
+        String errorOnUnique = getErrorOnUnique(e);
+        if (!errorOnUnique.isEmpty()) {
+            message = getErrorOnUniqueLocal(errorOnUnique);
         }
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         ModelAndView mav = new ModelAndView("exception",

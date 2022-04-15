@@ -41,8 +41,9 @@ public class ExceptionInfoHandler extends AbstractExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler({DataIntegrityViolationException.class, PSQLException.class})
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        if (checkUniqueEmailError(e)) {
-            return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, getUniqueEmailError());
+        String errorOnUnique = getErrorOnUnique(e);
+        if (!errorOnUnique.isEmpty()) {
+            return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, getErrorOnUniqueLocal(errorOnUnique));
         }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
@@ -67,7 +68,6 @@ public class ExceptionInfoHandler extends AbstractExceptionHandler {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);
     }
 
-    //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         if (logException) {
