@@ -1,7 +1,10 @@
 package ru.javawebinar.topjava.web;
 
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,6 +26,8 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.Locale;
+
 import static ru.javawebinar.topjava.util.ValidationUtil.getErrors;
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -30,6 +35,9 @@ import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 @Order(Ordered.HIGHEST_PRECEDENCE + 5)
 public class ExceptionInfoHandler {
     private static Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
+
+    @Autowired
+    private MessageSource messageSource;
 
     //  http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -41,6 +49,12 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
+        boolean emailError = ValidationUtil.getRootCause(e).getMessage().contains ("users_unique_email_idx");
+        if (emailError) {
+            String messageError = messageSource.getMessage("error.email", null, "Default",
+                    Locale.getDefault());
+            return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, messageError);
+        }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
