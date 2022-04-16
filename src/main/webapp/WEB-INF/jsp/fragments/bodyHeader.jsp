@@ -26,5 +26,16 @@
                 </button>
             </form:form>
         </sec:authorize>
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                    ${pageContext.response.locale}
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href='${pageContext.request.contextPath}?locale=en'>English</a>
+                    <a class="dropdown-item" href='${pageContext.request.contextPath}?locale=ru'>Русский</a>
+                </div>
+            </li>
+        </ul>
     </div>
 </nav>
