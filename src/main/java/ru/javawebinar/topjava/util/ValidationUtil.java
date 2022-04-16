@@ -73,6 +73,4 @@ public class ValidationUtil {
         Throwable rootCause = NestedExceptionUtils.getRootCause(t);
         return rootCause != null ? rootCause : t;
     }
-
-
 }
