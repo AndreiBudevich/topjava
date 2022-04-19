@@ -13,21 +13,16 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @ControllerAdvice
-public class GlobalExceptionHandler extends AbstractExceptionHandler {
+public class GlobalExceptionHandler extends ExceptionMessage {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     public ModelAndView defaultErrorHandler(HttpServletRequest req, Exception e) {
         log.error("Exception at request " + req.getRequestURL(), e);
         Throwable rootCause = ValidationUtil.getRootCause(e);
-        String message = rootCause.toString();
-        String errorOnUnique = getErrorOnUnique(e);
-        if (!errorOnUnique.isEmpty()) {
-            message = getErrorOnUniqueLocal(errorOnUnique);
-        }
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         ModelAndView mav = new ModelAndView("exception",
-                Map.of("exception", rootCause, "message", message, "status", httpStatus));
+                Map.of("exception", rootCause, "message", rootCause, "status", httpStatus));
         mav.setStatus(httpStatus);
 
         // Interceptor is not invoked, put userTo
@@ -38,3 +33,5 @@ public class GlobalExceptionHandler extends AbstractExceptionHandler {
         return mav;
     }
 }
+
+

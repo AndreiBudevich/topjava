@@ -153,6 +153,20 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(admin))
                 .content("{\"name\": \"Duplicate\",\"email\": \"user@yandex.ru\", \"password\": \"pass2\"}"))
-                .andExpect(content().string(containsString("Пользователь с такой почтой уже есть в приложении")));
+                .andDo(print())
+                .andExpect(content().string(containsString(getMessage("error.user.email"))));
+    }
+
+    @Test
+    void createNotValid() throws Exception {
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(admin))
+                .content("{\"name\": \"D\",\"email\": \"user1yandex.ru\", \"password\": \"p\", \"caloriesPerDay\": \"2\"}"))
+                .andDo(print())
+                .andExpect(content().string(containsString("[name] размер должен находиться в диапазоне от 2 до 128")))
+                .andExpect(content().string(containsString("[email] должно иметь формат адреса электронной почты")))
+                .andExpect(content().string(containsString("[password] размер должен находиться в диапазоне от 5 до 128")))
+                .andExpect(content().string(containsString("[caloriesPerDay] должно находиться в диапазоне от 10 до 10000")));
     }
 }

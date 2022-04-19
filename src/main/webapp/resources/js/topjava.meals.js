@@ -4,6 +4,7 @@ const mealAjaxUrl = "profile/meals/";
 const ctx = {
     ajaxUrl: mealAjaxUrl,
     updateTable: function () {
+        startDate.setLocale('ru')
         $.ajax({
             type: "GET",
             url: mealAjaxUrl + "filter",
@@ -69,6 +70,7 @@ $(function () {
     });
 
 //  http://xdsoft.net/jqplugins/datetimepicker/
+    $.datetimepicker.setLocale('ru');
     var startDate = $('#startDate');
     var endDate = $('#endDate');
     startDate.datetimepicker({

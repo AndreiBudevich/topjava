@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,15 +21,17 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
 @RestControllerAdvice(annotations = RestController.class)
 @Order(Ordered.HIGHEST_PRECEDENCE + 5)
-public class ExceptionInfoHandler extends AbstractExceptionHandler {
+public class ExceptionInfoHandler extends ExceptionMessage {
     private static Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
-    //  http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotFoundException.class)
     public ErrorInfo handleError(HttpServletRequest req, NotFoundException e) {
@@ -40,10 +41,6 @@ public class ExceptionInfoHandler extends AbstractExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        String errorOnUnique = getErrorOnUnique(e);
-        if (!errorOnUnique.isEmpty()) {
-            return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, getErrorOnUniqueLocal(errorOnUnique));
-        }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
@@ -54,10 +51,10 @@ public class ExceptionInfoHandler extends AbstractExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler(BindException.class)
     public ErrorInfo incorrectDataError(HttpServletRequest req, Exception e) {
         BindingResult result = ((BindException) e).getBindingResult();
-        String detail = getErrors(result);
+        Set<String> detail = getErrors(result);
         return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, detail);
     }
 
@@ -67,13 +64,25 @@ public class ExceptionInfoHandler extends AbstractExceptionHandler {
         return logAndGetErrorInfo(req, e, true, APP_ERROR);
     }
 
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
+    private ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
+        String message = rootCause.toString();
+        String error = getErrorLocalMessage(e);
+        if (!error.isEmpty()) {
+            message = error;
+            errorType = VALIDATION_ERROR;
+        }
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
-            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
+            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), message);
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
+        return new ErrorInfo(req.getRequestURL(), errorType, Set.of(message));
+    }
+
+    public static Set<String> getErrors(BindingResult result) {
+        return result.getFieldErrors().stream()
+                .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
+                .collect(Collectors.toCollection(HashSet::new));
     }
 }

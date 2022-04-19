@@ -128,12 +128,24 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void createNotValid() throws Exception {
+        perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content("{\"dateTime\": \"\",\"description\": \"е\", \"calories\": \"0\"}"))
+                .andDo(print())
+                .andExpect(content().string(containsString("[description] размер должен находиться в диапазоне от 2 до 120")))
+                .andExpect(content().string(containsString("[calories] должно находиться в диапазоне от 10 до 5000")))
+                .andExpect(content().string(containsString("[dateTime] не должно равняться null")));
+    }
+
+    @Test
     @Transactional(propagation = Propagation.NEVER)
     void createDuplicate() throws Exception {
         perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content("{\"dateTime\": \"2020-01-31T20:00:00\",\"description\": \"еда\", \"calories\": \"200\"}"))
-                .andExpect(content().string(containsString("У вас уже есть еда с такой датой/временем")));
+                .andExpect(content().string(containsString((getMessage("error.datetime")))));
     }
 }
